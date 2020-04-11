@@ -142,7 +142,7 @@ int main()
 
     Shader shader("shaders/basic.vs", "shaders/basic.fs");
     Shader sky_shader("shaders/skybox.vs", "shaders/skybox.fs");
-    Shader level_shader("shaders/level.vs", "shaders/level.fs");
+    //Shader level_shader("shaders/level.vs", "shaders/level.fs");
     
     ArrayObject sky = create_skybox();
     Model test_level("assets/zone.glb");
@@ -185,12 +185,12 @@ int main()
       glBindVertexArray(sky.vao);
       glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
 
-      level_shader.use();
-      level_shader.setMat4("model",
-        glm::scale(glm::identity<glm::mat4>(), glm::vec3{ 1, 1, 1 }));
-      level_shader.setMat4("view", view);
-      level_shader.setMat4("projection", projection);
-      test_level.Draw(level_shader);
+      //level_shader.use();
+      //level_shader.setMat4("model",
+      //  glm::scale(glm::identity<glm::mat4>(), glm::vec3{ 1, 1, 1 }));
+      //level_shader.setMat4("view", view);
+      //level_shader.setMat4("projection", projection);
+      //test_level.Draw(level_shader);
 
       // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
       // -------------------------------------------------------------------------------
