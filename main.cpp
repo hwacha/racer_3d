@@ -10,12 +10,14 @@
 #include <tuple>
 
 #include "shader.h"
+#include "skybox.h"
+#include "model.h"
 
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-const unsigned int SCR_WIDTH = 1280;
-const unsigned int SCR_HEIGHT = 720;
+unsigned int scr_width = 1280;
+unsigned int scr_height = 720;
 
 std::vector<float> icosahedron_vertices(float radius) {
     int i;
@@ -95,7 +97,7 @@ int main()
 
     // glfw window creation
     // --------------------
-    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Racer3D", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(scr_width, scr_height, "Racer3D", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -139,13 +141,20 @@ int main()
     glBindVertexArray(0);
 
     Shader shader("shaders/basic.vs", "shaders/basic.fs");
+    Shader sky_shader("shaders/skybox.vs", "shaders/skybox.fs");
+    Shader level_shader("shaders/level.vs", "shaders/level.fs");
+    
+    ArrayObject sky = create_skybox();
+    Model test_level("assets/zone.glb");
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glEnable(GL_DEPTH_TEST);
 
+    glm::vec3 player_position{ 0,0,0 };
+    
     while(!glfwWindowShouldClose(window)) {
     	// handle inputs
     	processInput(window);
-
+      
     	// render
       // ------
       glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -155,20 +164,35 @@ int main()
 
       glm::mat4 view;
       view = glm::lookAt(
-          glm::vec3(0.0f, 0.0f, 3.0f),
-          glm::vec3(0.0f, 0.0f, 0.0f),
+          player_position + glm::vec3(3.0f, 1.0f, 0.0f),
+          player_position,
           glm::vec3(0.0f, 1.0f, 0.0f));
       shader.setMat4("view", view);
 
+      player_position.x += -0.0005;
       glm::mat4 projection;
-      projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+      projection = glm::perspective(glm::radians(45.0f), 
+        scr_width / (float) scr_height, 1.f, 1000.0f);
       shader.setMat4("projection", projection);
+      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
       glBindVertexArray(vertex_arr);
       glDrawElements(GL_TRIANGLES, 3*20, GL_UNSIGNED_INT, (void*)0);
       glBindVertexArray(0);
 
-    	// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+      sky_shader.use();
+      glBindVertexArray(sky.vao);
+      glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
+
+      level_shader.use();
+      level_shader.setMat4("model",
+        glm::scale(glm::identity<glm::mat4>(), glm::vec3{ 1, 1, 1 }));
+      level_shader.setMat4("view", view);
+      level_shader.setMat4("projection", projection);
+      test_level.Draw(level_shader);
+
+      // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
       // -------------------------------------------------------------------------------
       glfwSwapBuffers(window);
       glfwPollEvents();
@@ -193,4 +217,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     // make sure the viewport matches the new window dimensions; note that width and 
     // height will be significantly larger than specified on retina displays.
     glViewport(0, 0, width, height);
+    scr_width = width;
+    scr_height = height;
 }
