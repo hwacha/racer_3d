@@ -47,7 +47,7 @@ void step_player(PlayerInputs input, Player *player) {
 
     // update heading
     if (player->velocity != glm::vec3(0.0f)) {
-        player->heading = player->velocity;
+        player->heading = glm::normalize(player->velocity);
     }
 
     return;

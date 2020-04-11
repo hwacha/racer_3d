@@ -101,8 +101,8 @@ int main()
 
       glm::mat4 view;
       view = glm::lookAt(
-          player.position - player.heading + glm::vec3(0.0f, 1.0f, 1.0f),
-          glm::vec3(player.position),
+          player.position - 2.0f*player.heading + glm::vec3(0.0f, 1.0f, 0.0f),
+          player.position,
           glm::vec3(0.0f, 1.0f, 0.0f));
       shader.setMat4("view", view);
 
