@@ -18,6 +18,7 @@
 #endif
 
 #include "model.h"
+#include "obstacle.h"
 
 #ifndef PLAYER_H
 #define PLAYER_H
@@ -34,6 +35,9 @@ unsigned int scr_height = 720;
 
 int main()
 {
+    int i;
+    int j;
+
     // glfw: initialize and configure
     // ------------------------------
     glfwInit();
@@ -64,12 +68,33 @@ int main()
         return -1;
     }
 
+    // World
+    std::vector<Obstacle> world_cubes{0};
+
+    // Floor
+    for ( i = 0 ; i < 10 ; i++ ) {
+        float scale = 5.0f;
+        Obstacle floor_piece{scale, glm::vec3(2.0f * scale * i, -scale, 0.0f)};
+        world_cubes.push_back(floor_piece);
+    }
+    // obstacles
+   	float scale = 1.0f;
+   	Obstacle obs_1{scale, glm::vec3(10.0f, 0.5f, 0.0f)};
+   	world_cubes.push_back(obs_1);
+
+   	Obstacle obs_2{scale, glm::vec3(20.0f, 0.5f, 3.0f)};
+   	world_cubes.push_back(obs_2);
+
+   	Obstacle obs_3{scale, glm::vec3(30.0f, 0.5f, -3.0f)};
+   	world_cubes.push_back(obs_3);
+
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     unsigned int icosahedron_va = make_icosahedron();
     unsigned int cube_va = make_cube();
 
     Shader icosahedron_shader("shaders/icosahedron.vs", "shaders/icosahedron.fs");
+    Shader obstacle_shader("shaders/obstacle.vs", "shaders/obstacle.fs");
     Shader sky_shader("shaders/skybox.vs", "shaders/skybox.fs");
     Shader level_shader("shaders/level.vs", "shaders/level.fs");
 
@@ -98,7 +123,7 @@ int main()
       // view
       glm::mat4 view;
       view = glm::lookAt(
-          player.position - 2.0f*player.heading + glm::vec3(0.0f, 1.0f, 0.0f),
+          player.position - 2.0f*player.heading + glm::vec3(0.0f, 0.5f, 0.0f),
           player.position,
           glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -128,18 +153,37 @@ int main()
 
       draw_icosahedron(icosahedron_shader, icosahedron_model, icosahedron_va);
 
+      // floor and obstacles
+      level_shader.use();
+
+      level_shader.setMat4("view", view);
+      level_shader.setMat4("projection", projection);
+
+      for (auto obs : world_cubes) {
+          glm::mat4 id_mat = glm::mat4(1.0f);
+
+          glm::mat4 scale_mat = glm::scale(glm::mat4(1.0f), glm::vec3(obs.scale));
+          glm::mat4 trans_mat = glm::translate(glm::mat4(1.0f), obs.position);
+
+          glm::mat4 obstacle_model = trans_mat * scale_mat * id_mat;
+
+          draw_cube(level_shader, obstacle_model, cube_va);
+      }
+
       // sky
 
       sky_shader.use();
       glBindVertexArray(sky.vao);
       glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
 
-      level_shader.use();
-      level_shader.setMat4("model",
-       glm::scale(glm::mat4(1.0f), glm::vec3{ 0.1f, 0.1f, 0.1f }));
-      level_shader.setMat4("view", view);
-      level_shader.setMat4("projection", projection);
-      test_level.Draw(level_shader);
+      // level
+
+      //level_shader.use();
+      //level_shader.setMat4("model",
+      // glm::scale(glm::mat4(1.0f), glm::vec3{ 0.1f, 0.1f, 0.1f }));
+      //level_shader.setMat4("view", view);
+      //level_shader.setMat4("projection", projection);
+      //test_level.Draw(level_shader);
 
       // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
       // -------------------------------------------------------------------------------
