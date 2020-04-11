@@ -10,11 +10,11 @@
 #include <tuple>
 
 #include "icosahedron.h"
+#include "input.h"
 #include "model.h"
 #include "shader.h"
 #include "skybox.h"
 
-void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 unsigned int scr_width = 1280;
@@ -69,7 +69,10 @@ int main()
     
     while(!glfwWindowShouldClose(window)) {
     	// handle inputs
-    	processInput(window);
+      PlayerInputs inputs = poll_inputs(window);
+      if (inputs.key_esc_pressed) {
+          break;
+      }
       
     	// render
       // ------
@@ -112,14 +115,6 @@ int main()
 
     glfwTerminate();
     return 0;
-}
-
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
