@@ -94,3 +94,13 @@ unsigned int make_icosahedron() {
 
     return vertex_arr;
 }
+
+void draw_icosahedron(unsigned int icosahedron_va) {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    glBindVertexArray(icosahedron_va);
+    glDrawElements(GL_TRIANGLES, 3*20, GL_UNSIGNED_INT, (void*)0);
+    glBindVertexArray(0);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // reset
+}

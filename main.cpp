@@ -90,13 +90,9 @@ int main()
       projection = glm::perspective(glm::radians(45.0f), 
         scr_width / (float) scr_height, 1.f, 1000.0f);
       shader.setMat4("projection", projection);
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-      glBindVertexArray(icosahedron_va);
-      glDrawElements(GL_TRIANGLES, 3*20, GL_UNSIGNED_INT, (void*)0); // todo: try to encapsulate
-      glBindVertexArray(0);
+      draw_icosahedron(icosahedron_va);
 
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
       sky_shader.use();
       glBindVertexArray(sky.vao);
       glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
