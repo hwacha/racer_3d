@@ -5,7 +5,7 @@
 
 Player initial_player() {
     struct Player player;
-    player.position = glm::vec3(0.0f);
+    player.position = glm::vec3(0.0f, 0.5f, 0.0f);
     player.velocity = glm::vec3(0.0f);
     player.heading = glm::vec3(1.0f, 0.0f, 0.0f);
     return player;
@@ -20,10 +20,10 @@ void step_player(PlayerInputs input, Player *player) {
     // apply forward acceleration
     float accel = 0.0;
     if (input.key_w_pressed) {
-        accel += 0.001f;
+        accel += 0.025f;
     }
     if (input.key_s_pressed) {
-        accel -= 0.001f;
+        accel -= 0.025f;
     }
     player->velocity += accel * forward;
 
@@ -42,7 +42,7 @@ void step_player(PlayerInputs input, Player *player) {
     player->velocity = glm::vec3(v.x, v.y, v.z);
 
     // step position
-    player->velocity *= 1.0f - 0.02f; // drag
+    player->velocity *= 1.0f - 0.125f; // drag
     player->position += player->velocity;
 
     // update heading

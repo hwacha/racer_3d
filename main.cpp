@@ -73,11 +73,20 @@ int main()
 
     // Floor
     for ( i = 0 ; i < 10 ; i++ ) {
-        float scale = 2.0f;
-        Obstacle obs{scale, glm::vec3(2*scale*i, -scale-1.0f, 0.0f)};
-        world_cubes.push_back(obs);
+        float scale = 5.0f;
+        Obstacle floor_piece{scale, glm::vec3(2.0f * scale * i, -scale, 0.0f)};
+        world_cubes.push_back(floor_piece);
     }
-    //
+    // obstacles
+   	float scale = 1.0f;
+   	Obstacle obs_1{scale, glm::vec3(10.0f, 0.5f, 0.0f)};
+   	world_cubes.push_back(obs_1);
+
+   	Obstacle obs_2{scale, glm::vec3(20.0f, 0.5f, 3.0f)};
+   	world_cubes.push_back(obs_2);
+
+   	Obstacle obs_3{scale, glm::vec3(30.0f, 0.5f, -3.0f)};
+   	world_cubes.push_back(obs_3);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -114,7 +123,7 @@ int main()
       // view
       glm::mat4 view;
       view = glm::lookAt(
-          player.position - 2.0f*player.heading + glm::vec3(0.0f, 1.0f, 0.0f),
+          player.position - 2.0f*player.heading + glm::vec3(0.0f, 0.5f, 0.0f),
           player.position,
           glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -135,7 +144,7 @@ int main()
 
       draw_icosahedron(icosahedron_shader, icosahedron_model, icosahedron_va);
 
-      // floor
+      // floor and obstacles
       obstacle_shader.use();
 
       obstacle_shader.setMat4("view", view);
