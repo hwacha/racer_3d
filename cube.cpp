@@ -63,11 +63,7 @@ void draw_cube(
 {
     shader.setMat4("model", transform);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
     glBindVertexArray(cube_va);
     glDrawElements(GL_TRIANGLES, 3*12, GL_UNSIGNED_INT, (void*)0);
     glBindVertexArray(0);
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // reset
 }
