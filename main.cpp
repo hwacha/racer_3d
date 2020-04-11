@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "shader.h"
+#include "skybox.h"
 
 void processInput(GLFWwindow *window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -75,6 +76,10 @@ int main()
     glBindVertexArray(0);
 
     Shader shader("shaders/basic.vs", "shaders/basic.fs");
+    Shader sky_shader("shaders/skybox.vs", "shaders/skybox.fs");
+	  ArrayObject sky = create_skybox();
+
+    glEnable(GL_DEPTH_TEST);
 
     while(!glfwWindowShouldClose(window)) {
     	// handle inputs
@@ -86,12 +91,14 @@ int main()
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       shader.use();
-
       glBindVertexArray(vertex_arr);
       glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)0);
-      glBindVertexArray(0);
 
-    	// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
+      sky_shader.use();
+      glBindVertexArray(sky.vao);
+      glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
+
+      // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
       // -------------------------------------------------------------------------------
       glfwSwapBuffers(window);
       glfwPollEvents();

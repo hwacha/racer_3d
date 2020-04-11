@@ -20,7 +20,7 @@ foreach (_variableName ${_variableNames})
 endforeach()
 
 
-add_executable(game main.cpp glad/glad.c)
+add_executable(game main.cpp skybox.cpp glad/glad.c)
 add_dependencies(game glfw)
 target_include_directories(game PUBLIC glfw-3.3.2/include glm/ assimp-5.0.0/include)
 target_link_libraries(game glfw)
