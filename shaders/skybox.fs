@@ -1,6 +1,6 @@
 #version 330 core
 
-varying vec3 pos;
+in vec3 pos;
 out vec4 FragColor;
 
 void main()

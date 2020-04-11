@@ -58,10 +58,10 @@ int main()
 
     Shader shader("shaders/basic.vs", "shaders/basic.fs");
     Shader sky_shader("shaders/skybox.vs", "shaders/skybox.fs");
-    //Shader level_shader("shaders/level.vs", "shaders/level.fs");
+    Shader level_shader("shaders/level.vs", "shaders/level.fs");
     
     ArrayObject sky = create_skybox();
-    Model test_level("assets/zone.glb");
+    Model test_level("nanosuit/nanosuit.obj");
 
     glEnable(GL_DEPTH_TEST);
 
@@ -88,7 +88,7 @@ int main()
           glm::vec3(0.0f, 1.0f, 0.0f));
       shader.setMat4("view", view);
 
-      player_position.x += -0.0005;
+      player_position.x += 0.05;
       glm::mat4 projection;
       projection = glm::perspective(glm::radians(45.0f), 
         scr_width / (float) scr_height, 1.f, 1000.0f);
@@ -100,12 +100,12 @@ int main()
       glBindVertexArray(sky.vao);
       glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
 
-      //level_shader.use();
-      //level_shader.setMat4("model",
-      //  glm::scale(glm::identity<glm::mat4>(), glm::vec3{ 1, 1, 1 }));
-      //level_shader.setMat4("view", view);
-      //level_shader.setMat4("projection", projection);
-      //test_level.Draw(level_shader);
+      level_shader.use();
+      level_shader.setMat4("model",
+       glm::scale(glm::identity<glm::mat4>(), glm::vec3{ 0.1f, 0.1f, 0.1f }));
+      level_shader.setMat4("view", view);
+      level_shader.setMat4("projection", projection);
+      test_level.Draw(level_shader);
 
       // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
       // -------------------------------------------------------------------------------
