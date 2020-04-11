@@ -72,7 +72,7 @@ int main()
     Shader level_shader("shaders/level.vs", "shaders/level.fs");
     
     ArrayObject sky = create_skybox();
-    Model test_level("nanosuit/nanosuit.obj");
+    Model test_level("assets/zone.obj");
 
     glEnable(GL_DEPTH_TEST);
 
@@ -100,13 +100,9 @@ int main()
       shader.setMat4("model", model);
 
       glm::mat4 view;
-      //view = glm::lookAt(
-      //    player_position + glm::vec3(3.0f, 1.0f, 0.0f),
-      //    player_position,
-      //    glm::vec3(0.0f, 1.0f, 0.0f));
       view = glm::lookAt(
-          glm::vec3(3.0f, 20.0f, 0.0f),
-          glm::vec3(0.0f),
+          player.position - player.heading + glm::vec3(0.0f, 1.0f, 1.0f),
+          glm::vec3(player.position),
           glm::vec3(0.0f, 1.0f, 0.0f));
       shader.setMat4("view", view);
 
