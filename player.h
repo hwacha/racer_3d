@@ -15,6 +15,8 @@ struct Player {
     glm::vec3 position;
     glm::vec3 velocity;
     glm::vec3 heading; // in case velocity is zero, should always be zero
+    float pitch_rads;
+    float yaw_rads;
 };
 
 Player initial_player();
