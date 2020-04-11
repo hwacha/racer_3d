@@ -6,4 +6,4 @@ struct PlayerInputs {
     bool key_esc_pressed;
 };
 
-PlayerInputs poll_inputs(GLFWwindow*);
+PlayerInputs poll_inputs(GLFWwindow *window);

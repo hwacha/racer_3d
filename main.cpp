@@ -10,8 +10,19 @@
 #include <tuple>
 
 #include "icosahedron.h"
+
+#ifndef INPUT
+#define INPUT
 #include "input.h"
+#endif
+
 #include "model.h"
+
+#ifndef PLAYER_H
+#define PLAYER_H
+#include "player.h"
+#endif
+
 #include "shader.h"
 #include "skybox.h"
 
@@ -65,7 +76,8 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
 
-    glm::vec3 player_position{ 0,0,0 };
+    /* glm::vec3 player_position{ 0,0,0 }; */
+    Player player = initial_player();
     
     while(!glfwWindowShouldClose(window)) {
     	// handle inputs
@@ -73,7 +85,9 @@ int main()
       if (inputs.key_esc_pressed) {
           break;
       }
-      
+
+      step_player(inputs, &player);
+
     	// render
       // ------
       glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -81,14 +95,22 @@ int main()
 
       shader.use();
 
+      glm::mat4 model;
+      model = glm::translate(glm::mat4(1.0f), player.position);
+      shader.setMat4("model", model);
+
       glm::mat4 view;
+      //view = glm::lookAt(
+      //    player_position + glm::vec3(3.0f, 1.0f, 0.0f),
+      //    player_position,
+      //    glm::vec3(0.0f, 1.0f, 0.0f));
       view = glm::lookAt(
-          player_position + glm::vec3(3.0f, 1.0f, 0.0f),
-          player_position,
+          glm::vec3(3.0f, 20.0f, 0.0f),
+          glm::vec3(0.0f),
           glm::vec3(0.0f, 1.0f, 0.0f));
       shader.setMat4("view", view);
 
-      player_position.x += 0.05;
+      //player_position.x += -0.0005;
       glm::mat4 projection;
       projection = glm::perspective(glm::radians(45.0f), 
         scr_width / (float) scr_height, 1.f, 1000.0f);
@@ -102,7 +124,7 @@ int main()
 
       level_shader.use();
       level_shader.setMat4("model",
-       glm::scale(glm::identity<glm::mat4>(), glm::vec3{ 0.1f, 0.1f, 0.1f }));
+       glm::scale(glm::mat4(1.0f), glm::vec3{ 0.1f, 0.1f, 0.1f }));
       level_shader.setMat4("view", view);
       level_shader.setMat4("projection", projection);
       test_level.Draw(level_shader);
