@@ -13,14 +13,7 @@ add_subdirectory(glfw-3.3.2)
 add_subdirectory(glm)
 add_subdirectory(assimp-5.0.0)
 
-get_cmake_property(_variableNames VARIABLES)
-list (SORT _variableNames)
-foreach (_variableName ${_variableNames})
-    message(STATUS "XXX ${_variableName}=${${_variableName}}")
-endforeach()
-
-
 add_executable(game main.cpp skybox.cpp glad/glad.c)
-add_dependencies(game glfw)
-target_include_directories(game PUBLIC glfw-3.3.2/include glm/ assimp-5.0.0/include)
-target_link_libraries(game glfw)
+add_dependencies(game glfw assimp)
+target_include_directories(game PUBLIC glfw-3.3.2/include glm/ "${Assimp_SOURCE_DIR}/include" "${Assimp_BINARY_DIR}/include")
+target_link_libraries(game glfw assimp)

@@ -4,11 +4,12 @@
 #include "skybox.h"
 
 ArrayObject create_skybox() {
+  float z = 0.999;
   float skybox_vertices[] = {
-   -1 , -1,  0,
-   -1,   1,  0,
-    1,  -1,  0,
-    1,   1,  0
+   -1 , -1,  z,
+   -1,   1,  z,
+    1,  -1,  z,
+    1,   1,  z,
   };
 
   GLuint skybox_indices[] = { 0, 1, 2, 1, 2, 3, 0, 2, 1, 2, 1, 3 };
