@@ -67,10 +67,10 @@ int main()
 
     unsigned int icosahedron_va = make_icosahedron();
 
-    Shader shader("shaders/basic.vs", "shaders/basic.fs");
+    Shader icosahedron_shader("shaders/icosahedron.vs", "shaders/icosahedron.fs");
     Shader sky_shader("shaders/skybox.vs", "shaders/skybox.fs");
     Shader level_shader("shaders/level.vs", "shaders/level.fs");
-    
+
     ArrayObject sky = create_skybox();
     Model test_level("assets/zone.obj");
 
@@ -78,7 +78,7 @@ int main()
 
     /* glm::vec3 player_position{ 0,0,0 }; */
     Player player = initial_player();
-    
+
     while(!glfwWindowShouldClose(window)) {
     	// handle inputs
       PlayerInputs inputs = poll_inputs(window);
@@ -93,26 +93,31 @@ int main()
       glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-      shader.use();
-
-      glm::mat4 model;
-      model = glm::translate(glm::mat4(1.0f), player.position);
-      shader.setMat4("model", model);
-
+      // view
       glm::mat4 view;
       view = glm::lookAt(
           player.position - 2.0f*player.heading + glm::vec3(0.0f, 1.0f, 0.0f),
           player.position,
           glm::vec3(0.0f, 1.0f, 0.0f));
-      shader.setMat4("view", view);
 
-      //player_position.x += -0.0005;
+      // projection
       glm::mat4 projection;
-      projection = glm::perspective(glm::radians(45.0f), 
+      projection = glm::perspective(glm::radians(45.0f),
         scr_width / (float) scr_height, 1.f, 1000.0f);
-      shader.setMat4("projection", projection);
 
-      draw_icosahedron(icosahedron_va);
+      // icosahedron
+
+      icosahedron_shader.use();
+
+      glm::mat4 icosahedron_model;
+      icosahedron_model = glm::translate(glm::mat4(1.0f), player.position);
+
+      icosahedron_shader.setMat4("view", view);
+      icosahedron_shader.setMat4("projection", projection);
+
+      draw_icosahedron(icosahedron_shader, icosahedron_model, icosahedron_va);
+
+      // sky
 
       sky_shader.use();
       glBindVertexArray(sky.vao);

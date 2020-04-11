@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "icosahedron.h"
+#include "shader.h"
 
 std::vector<float> icosahedron_vertices(float radius) {
     int i;
@@ -95,7 +96,13 @@ unsigned int make_icosahedron() {
     return vertex_arr;
 }
 
-void draw_icosahedron(unsigned int icosahedron_va) {
+void draw_icosahedron(
+    Shader shader,
+    glm::mat4 transform,
+    unsigned int icosahedron_va)
+{
+    shader.setMat4("model", transform);
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     glBindVertexArray(icosahedron_va);
