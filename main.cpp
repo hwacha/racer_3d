@@ -9,6 +9,7 @@
 #include <vector>
 #include <tuple>
 
+#include "cube.h"
 #include "icosahedron.h"
 
 #ifndef INPUT
@@ -66,6 +67,7 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     unsigned int icosahedron_va = make_icosahedron();
+    unsigned int cube_va = make_cube();
 
     Shader icosahedron_shader("shaders/icosahedron.vs", "shaders/icosahedron.fs");
     Shader sky_shader("shaders/skybox.vs", "shaders/skybox.fs");

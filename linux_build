@@ -1,1 +1,1 @@
-g++ -std=c++11 -W -Wdeprecated main.cpp icosahedron.cpp input.cpp player.cpp skybox.cpp -lGL -lglut glad/glad.c -lglfw -lassimp -ldl -o scene.out
+g++ -std=c++11 -W -Wdeprecated main.cpp cube.cpp icosahedron.cpp input.cpp player.cpp skybox.cpp -lGL -lglut glad/glad.c -lglfw -lassimp -ldl -o scene.out
