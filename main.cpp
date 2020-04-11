@@ -145,10 +145,10 @@ int main()
       draw_icosahedron(icosahedron_shader, icosahedron_model, icosahedron_va);
 
       // floor and obstacles
-      obstacle_shader.use();
+      level_shader.use();
 
-      obstacle_shader.setMat4("view", view);
-      obstacle_shader.setMat4("projection", projection);
+      level_shader.setMat4("view", view);
+      level_shader.setMat4("projection", projection);
 
       for (auto obs : world_cubes) {
           glm::mat4 id_mat = glm::mat4(1.0f);
@@ -158,7 +158,7 @@ int main()
 
           glm::mat4 obstacle_model = trans_mat * scale_mat * id_mat;
 
-          draw_cube(obstacle_shader, obstacle_model, cube_va);
+          draw_cube(level_shader, obstacle_model, cube_va);
       }
 
       // sky
