@@ -102,8 +102,8 @@ void draw_icosahedron(
     unsigned int icosahedron_va)
 {
     shader.setMat4("model", transform);
-
-    glBindVertexArray(icosahedron_va);
+	shader.setFloat("t", (float)glfwGetTime());
+	glBindVertexArray(icosahedron_va);
     glDrawElements(GL_TRIANGLES, 3*20, GL_UNSIGNED_INT, (void*)0);
     glBindVertexArray(0);
 }

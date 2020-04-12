@@ -127,7 +127,7 @@ int main()
     unsigned int cube_va = make_cube();
 
     Shader icosahedron_shader("shaders/icosahedron.vs", "shaders/icosahedron.fs");
-    Shader icosahedron_edge_shader("shaders/icosahedron_edge.vs", "shaders/icosahedron_edge.fs");
+    ///Shader icosahedron_edge_shader("shaders/icosahedron_edge.vs", "shaders/icosahedron_edge.fs");
     Shader obstacle_shader("shaders/obstacle.vs", "shaders/obstacle.fs");
     Shader sky_shader("shaders/skybox.vs", "shaders/skybox.fs");
     Shader level_shader("shaders/level.vs", "shaders/level.fs");
@@ -188,21 +188,19 @@ int main()
 
         // icosahedron body
       icosahedron_shader.use();
-
       icosahedron_shader.setMat4("view", view);
       icosahedron_shader.setMat4("projection", projection);
-
       draw_icosahedron(icosahedron_shader, icosahedron_model, icosahedron_va);
 
-        // icosahedron edges
-      icosahedron_edge_shader.use();
+      // icosahedron edges
+      // icosahedron_edge_shader.use();
 
-      icosahedron_edge_shader.setMat4("view", view);
-      icosahedron_edge_shader.setMat4("projection", projection);
+      // icosahedron_edge_shader.setMat4("view", view);
+      // icosahedron_edge_shader.setMat4("projection", projection);
 
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      draw_icosahedron(icosahedron_edge_shader, icosahedron_model, icosahedron_va);
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // reset
+      // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      // draw_icosahedron(icosahedron_edge_shader, icosahedron_model, icosahedron_va);
+      // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // reset
 
 
       // floor and obstacles
