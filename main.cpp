@@ -79,6 +79,36 @@ struct FrameBuffer {
 };
 
 
+
+unsigned int createTexture(char* filename)
+{
+	unsigned int texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load and generate the texture
+	int width, height, nrChannels;
+	unsigned char *data = stbi_load(filename, &width, &height, &nrChannels, 0);
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+	}
+	stbi_image_free(data);
+
+	return texture;//?
+}
+
+
+
 int main()
 {
     int i;
@@ -147,6 +177,7 @@ int main()
 
     ArrayObject sky = create_fullscreen_quad();
     Model test_level("assets/zone.obj");
+	unsigned int testTexture = createTexture("assets/checker-map_tho.png");
 
     glEnable(GL_DEPTH_TEST);
 
@@ -218,6 +249,7 @@ int main()
 
           glm::mat4 obstacle_model = trans_mat * scale_mat * id_mat;
 
+		  glBindTexture(GL_TEXTURE_2D, testTexture);
           draw_cube(level_shader, obstacle_model, cube_va);
       }
 
@@ -244,7 +276,7 @@ int main()
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       pass_shader.use();
 	  glActiveTexture(GL_TEXTURE0);
-	  glUniform1i(glGetUniformLocation(level_shader.ID, "texture_diffuse1"), 0);
+	  glUniform1i(glGetUniformLocation(pass_shader.ID, "screenTexture"), 0);
 	  // uniform location 0 gets texture unit 0
 	  glBindTexture(GL_TEXTURE_2D, buffer0.texture_color);
 	  ArrayObject full_screen_quad = create_fullscreen_quad();
