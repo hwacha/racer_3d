@@ -201,10 +201,10 @@ int main()
 
       // view
       glm::vec3 camera_pos =
-          player.position - 2.0f*player.forward() + glm::vec3(0.0f, 0.5f, 0.0f);
+          player.position - 3.0f*player.forward() + glm::vec3(0.0f, 0.75f, 0.0f);
       glm::mat4 view = glm::lookAt(
           camera_pos,
-          player.position,
+          player.position + glm::vec3(0.0f, 0.5f, 0.0f), // top of icosahedron
           glm::vec3(0.0f, 1.0f, 0.0f)
           );
 
