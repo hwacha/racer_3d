@@ -10,6 +10,7 @@
 #include <tuple>
 
 #include "prism.h"
+#include "effect.h"
 #include "framebuffer.h"
 #include "icosahedron.h"
 
@@ -68,7 +69,6 @@ bool collides_with(Player *player, Obstacle *obstacle) {
 
   float rel_x = max(0.0f, abs(player->position.x - obstacle->position.x) - obstacle->scale.x);
   float rel_z = max(0.0f, abs(player->position.z - obstacle->position.z) - obstacle->scale.z);
-pe
   return (rel_x*rel_x + rel_z*rel_z <= player_radius*player_radius);
 }
 
@@ -157,8 +157,12 @@ int main()
     // 1 if player 1 wins, 2 if player 2 wins, etc.
     int winning_player = 0;
 
-    while(!glfwWindowShouldClose(window)) {
+	EffectSystem fx_system {};
+
+	while(!glfwWindowShouldClose(window)) {
       buffer0.activate();
+
+	  fx_system.Update(1);
 
     	// handle inputs
       PlayerInputs inputs = poll_inputs(window);
@@ -185,6 +189,7 @@ int main()
       		if (collides_with(&player, &obstacle)) {
           	 	player.position = old_position;
           	 	player.speed *= -1.0f;
+				fx_system.create_collision((void *)&player, player.position);
       		}
       	}
       	if (obstacle.collision_type & 2) {
@@ -268,7 +273,13 @@ int main()
       glBindVertexArray(sky.vao);
       glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
 
-      // level
+	  // effects
+	  sky_shader.use();
+	  fx_system.view = view;
+	  fx_system.proj = projection;
+	  fx_system.Draw();
+
+	  // level
 
       //level_shader.use();
       //level_shader.setMat4("model",
