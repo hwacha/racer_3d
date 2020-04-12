@@ -13,10 +13,15 @@
 
 struct Player {
     glm::vec3 position;
-    glm::vec3 velocity;
-    glm::vec3 heading; // in case velocity is zero, should always be zero
-    float pitch_rads;
+    float speed;
+    float pitch_rads; // currently just for rolling animation
     float yaw_rads;
+    glm::vec3 forward() {
+	  glm::mat4 rotation = glm::rotate(glm::mat4(1.0f), yaw_rads, {0, 1, 0});
+    // TODO pitch
+    glm::vec4 res = rotation * glm::vec4{ 1, 0, 0, 1 };
+    return { res.x, res.y, res.z };
+	}
 };
 
 Player initial_player();

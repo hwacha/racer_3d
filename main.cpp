@@ -123,7 +123,7 @@ int main()
       // view
       glm::mat4 view;
       view = glm::lookAt(
-          player.position - 2.0f*player.heading + glm::vec3(0.0f, 0.5f, 0.0f),
+          player.position - 2.0f*player.forward() + glm::vec3(0.0f, 0.5f, 0.0f),
           player.position,
           glm::vec3(0.0f, 1.0f, 0.0f));
 
