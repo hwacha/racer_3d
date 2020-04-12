@@ -107,19 +107,24 @@ int main()
     // Floor
     for ( i = 0 ; i < 10 ; i++ ) {
         float scale = 5.0f;
-        Obstacle floor_piece{scale, glm::vec3(2.0f * scale * i, -scale, 0.0f)};
+        Obstacle floor_piece{0, scale, glm::vec3(2.0f * scale * i, -scale, 0.0f)};
         world_cubes.push_back(floor_piece);
     }
+
     // obstacles
    	float scale = 1.0f;
-   	Obstacle obs_1{scale, glm::vec3(10.0f, 0.5f, 0.0f)};
+   	Obstacle obs_1{1, scale, glm::vec3(10.0f, 0.5f, 0.0f)};
    	world_cubes.push_back(obs_1);
 
-   	Obstacle obs_2{scale, glm::vec3(20.0f, 0.5f, 3.0f)};
+   	Obstacle obs_2{1, scale, glm::vec3(20.0f, 0.5f, 3.0f)};
    	world_cubes.push_back(obs_2);
 
-   	Obstacle obs_3{scale, glm::vec3(30.0f, 0.5f, -3.0f)};
+   	Obstacle obs_3{1, scale, glm::vec3(30.0f, 0.5f, -3.0f)};
    	world_cubes.push_back(obs_3);
+
+   	// checkpoints
+   	Obstacle checkpoint{2, scale, glm::vec3(90.0f, 0.5f, 0.0f)};
+   	world_cubes.push_back(checkpoint);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -143,6 +148,9 @@ int main()
 
     FrameBuffer buffer0{scr_width, scr_height};
 
+    // 1 if player 1 wins, 2 if player 2 wins, etc.
+    int winning_player = 0;
+
     while(!glfwWindowShouldClose(window)) {
       buffer0.activate();
 
@@ -152,9 +160,42 @@ int main()
           break;
       }
 
-      step_player(inputs, &player);
+      if (winning_player) {
+      	// victory screen
+      	continue;
+      }
 
-    	// render
+      glm::vec3 old_position = glm::vec3(player.position.y, player.position.y, player.position.z);
+      
+      step_player(inputs, &player);
+      float player_width = 0.5f;
+
+      // check for collisions.
+      for (auto obstacle : world_cubes) {
+      	if (obstacle.collision_type & 1) {
+
+      		// TODO: check for collision with player
+      		if (player.position.x + player_width > obstacle.position.x - obstacle.scale &&
+          	 player.position.x - player_width < obstacle.position.x + obstacle.scale &&
+          	 player.position.z + player_width > obstacle.position.z - obstacle.scale &&
+          	 player.position.z - player_width < obstacle.position.z + obstacle.scale) {
+          	 	player.position = old_position;
+      		}
+      	}
+      	if (obstacle.collision_type & 2) {
+          if(player.position.x + player_width > obstacle.position.x - obstacle.scale &&
+          	 player.position.x - player_width < obstacle.position.x + obstacle.scale &&
+          	 player.position.z + player_width > obstacle.position.z - obstacle.scale &&
+          	 player.position.z - player_width < obstacle.position.z + obstacle.scale)
+           {
+            // @Note: this'll change once we
+            // have more than one player.
+            winning_player = 1;
+		  }
+      	}
+      }
+
+      // render
       // ------
       glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

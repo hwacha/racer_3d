@@ -8,6 +8,12 @@
 #include <glm/gtc/type_ptr.hpp>
 
 struct Obstacle { // cubes
+  // 0 = floor
+  // 1 = stop
+  // 2 = checkpoint
+  // 4 = lap
+
+  unsigned int collision_type;
   float scale;
   glm::vec3 position; // center of the cube
   // no orientation for now
