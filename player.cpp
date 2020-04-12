@@ -3,7 +3,8 @@
 #include "player.h"
 #endif
 
-#include <cmath>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 Player initial_player() {
     struct Player player;
