@@ -4,10 +4,10 @@
 #include <cmath>
 #include <vector>
 
-#include "cube.h"
+#include "prism.h"
 #include "shader.h"
 
-unsigned int make_cube() {
+unsigned int make_prism() {
   float vertices[] = {
 	-1, -1, -1, 0, 1, 0, 0, -1,
 	1, -1,  -1, 1, 1, 0, 0, -1,
@@ -107,13 +107,13 @@ unsigned int make_cube() {
   return vertex_arr;
 }
 
-void draw_cube(
+void draw_prism(
     Shader shader,
     glm::mat4 transform,
-    unsigned int cube_va)
+    unsigned int prism_va)
 {
     shader.setMat4("model", transform);
-    glBindVertexArray(cube_va);
+    glBindVertexArray(prism_va);
     glDrawElements(GL_TRIANGLES, 3*12, GL_UNSIGNED_INT, (void*)0);
     glBindVertexArray(0);
 }
