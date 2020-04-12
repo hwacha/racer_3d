@@ -12,6 +12,7 @@
 #endif
 
 struct Player {
+    unsigned int id;
     glm::vec3 position;
     float speed;
     float pitch_rads; // currently just for rolling animation
@@ -24,5 +25,5 @@ struct Player {
 	}
 };
 
-Player initial_player();
+Player initial_player(unsigned int id);
 void step_player(PlayerInputs input, Player *player);

@@ -6,8 +6,9 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-Player initial_player() {
+Player initial_player(unsigned int id) {
     struct Player player;
+    player.id = id;
     player.position = glm::vec3(0.0f, 0.5f, 0.0f);
     player.speed = 0.0f;
     player.pitch_rads = 0.0f; // Ack! Euler angles!
