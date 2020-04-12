@@ -10,6 +10,7 @@
 #include <tuple>
 
 #include "cube.h"
+#include "framebuffer.h"
 #include "icosahedron.h"
 
 #ifndef INPUT
@@ -32,51 +33,6 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 unsigned int scr_width = 1280;
 unsigned int scr_height = 720;
-
-struct FrameBuffer {
-	unsigned int fbo;
-	unsigned int texture_color, texture_stencil_depth;
-
-  // unsigned int rbo;
-
-  FrameBuffer() {
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-
-    // create a texture and attach it to the framebuffer
-    glGenTextures(1, &texture_color);
-    glBindTexture(GL_TEXTURE_2D, texture_color);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, scr_width, scr_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture_color, 0);
-    // depth/stencil buffer
-    glGenTextures(1, &texture_stencil_depth);
-    glBindTexture(GL_TEXTURE_2D, texture_stencil_depth);
-    glTexImage2D(
-      GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, scr_width, scr_height, 0,
-      GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL
-    );
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, texture_stencil_depth, 0);
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		// std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-		printf("ERROR::FRAMEBUFFERLL Framebuffer is not complete!\n");
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // glGenRenderbuffers(1, &rbo);
-  }
-  void activate(bool isActive = true) {
-    if (isActive)
-      glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    else
-      glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  }
-  void todo() {
-
-  }
-};
 
 
 
@@ -120,6 +76,7 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, false);
 
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -177,17 +134,17 @@ int main()
 
     ArrayObject sky = create_fullscreen_quad();
     Model test_level("assets/zone.obj");
-	unsigned int testTexture = createTexture("assets/checker-map_tho.png");
+    unsigned int testTexture = createTexture("assets/checker-map_tho.png");
 
     glEnable(GL_DEPTH_TEST);
 
     /* glm::vec3 player_position{ 0,0,0 }; */
     Player player = initial_player();
 
-    FrameBuffer buffer0{};
+    FrameBuffer buffer0{scr_width, scr_height};
 
     while(!glfwWindowShouldClose(window)) {
-	   buffer0.activate();
+      buffer0.activate();
 
     	// handle inputs
       PlayerInputs inputs = poll_inputs(window);
@@ -272,16 +229,7 @@ int main()
       // unbind the recorded buffer, now render it as a fullscreen quad to the real frame buffer
       buffer0.activate(false);
 
-      glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      pass_shader.use();
-	  glActiveTexture(GL_TEXTURE0);
-	  glUniform1i(glGetUniformLocation(pass_shader.ID, "screenTexture"), 0);
-	  // uniform location 0 gets texture unit 0
-	  glBindTexture(GL_TEXTURE_2D, buffer0.texture_color);
-	  ArrayObject full_screen_quad = create_fullscreen_quad();
-      glBindVertexArray(full_screen_quad.vao);
-      glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)0);
+      renderFramebuffer(pass_shader, buffer0);
 
       // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
       // -------------------------------------------------------------------------------

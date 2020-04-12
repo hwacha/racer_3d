@@ -1,3 +1,4 @@
+#pragma once
 
 struct ArrayObject {
   GLuint vao, array_buf, element_buf;
