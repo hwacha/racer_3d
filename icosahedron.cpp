@@ -74,31 +74,57 @@ unsigned int make_icosahedron() {
     std::vector<float> unique_vertices = icosahedron_vertices(0.5);
     std::vector<unsigned int> indices = icosahedron_indices();
 
-    std::vector<float> vertices{};
+    int attribStride = 9;
+    std::vector<float> vertices = std::vector<float>(attribStride*3*20);
 
-    int triangle;
+    int triangle = 0;
     int in_vertex = 0;
+    int out_vertex = 0;
     int index = 0;
     int i = 0;
+    int v = 0;
+    float acc_vec[] = { 0.0f, 0.0f, 0.0f };
+    int triangle_no = 0;
+
     // For each face (triangle) ...
     for ( triangle = 0 ; triangle < 20 ; triangle++ ) {
+        acc_vec[0] = 0.0; acc_vec[1] = 0.0; acc_vec[2] = 0.0; // reset accumulator for face normal
+
         // ... and for each of its vertices ...
         for ( in_vertex = 0 ; in_vertex < 3 ; in_vertex++ ) {
             // ... find its index in the unique vertices ...
-            index = indices[in_vertex + triangle*3];
+            out_vertex = triangle*3 + in_vertex;
+            index = indices[out_vertex];
+
             // ... write out the vertex coordinates ...
             for ( i = 0 ; i < 3 ; i++ ) {
-                vertices.push_back(unique_vertices[3*index + i]);
+                vertices[out_vertex*attribStride + i] =
+                    unique_vertices[3*index + i];
+                acc_vec[i] +=
+                    unique_vertices[3*index + i];
             }
-            // ... and write out the barycentric coordinates
+            // ... and write out the barycentric coordinates ...
             for ( i = 0 ; i < 3 ; i++ ) {
+                float bary;
                 if (i == in_vertex) {
-                    vertices.push_back(1.0);
+                    bary = 1.0;
                 } else {
-                    vertices.push_back(0.0);
+                    bary = 0.0;
                 }
+                vertices[out_vertex*attribStride + 3 + i] = bary;
             }
         }
+        // ... and write out face normals
+        glm::vec3 face_normal = glm::normalize(
+            glm::vec3(acc_vec[0], acc_vec[1], acc_vec[2])
+        );
+        for ( v = 0 ; v < 3 ; v++ ) {
+            out_vertex = 3*triangle + v;
+            for ( i = 0 ; i < 3 ; i ++ ){
+                vertices[out_vertex*attribStride + 6 + i] = face_normal[i];
+            }
+        }
+        triangle_no++;
     }
 
     unsigned int vertex_arr;
@@ -114,11 +140,14 @@ unsigned int make_icosahedron() {
         vertices.data(),
         GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9*sizeof(float), (void*)(3*sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9*sizeof(float), (void*)(6*sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 

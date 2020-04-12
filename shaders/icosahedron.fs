@@ -3,7 +3,9 @@
 out vec4 FragColor;
 
 in vec3 pos;
+in vec3 pos_screen;
 in vec3 bary;
+in vec3 normal;
 
 vec3 hsv2rgb(vec3 c)
 {
@@ -14,14 +16,27 @@ vec3 hsv2rgb(vec3 c)
 
 void main()
 {
-    //float dzdy = dFdy(pos.z);
-    //float dzdx = dFdx(pos.z);
-    //FragColor = vec4(0, 200 * dzdx, 200 * dzdy, 1.0f);
+    // WIP
+    float dzdy = dFdy(pos.z);
+    float dzdx = dFdx(pos.z);
+    //vec4 normals = vec4(0.2f, 200 * dzdx, 200 * dzdy, 1.0);
+    vec4 normals = vec4(normal, 1.0);
+
+    //vec4 osc = vec4(hsv2rgb(vec3(hue, 1.0f, 1.0f)), 1.0f);
+    vec4 osc = vec4(1.0f);
+
     float dist = min(bary.x, min(bary.y, bary.z)); // distance from edge
-    if (dist < 0.01) {
-        vec3 rgb = hsv2rgb(vec3(sin(pos.x), 1.0f, 1.0f));
-        FragColor = vec4(rgb, 1.0f);
-    } else {
-        FragColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    }
+    float factor = pow(1.0 - dist, 32);
+
+    FragColor = factor * osc + (1.0 - factor) * normals * 0.8;
 }
+
+//void main()
+//{ 
+//    float ratio = 1.00 / 1.52; // could be made a function of a wavelength
+//    vec3 I = normalize(Position - cameraPos);
+//    vec3 R = refract(I, normalize(Normal), ratio);
+//    FragColor = vec4(texture(skybox, R).rgb, 1.0);
+//} 
+
+//https://en.wikipedia.org/wiki/Cauchy%27s_equation
