@@ -1,6 +1,7 @@
 #version 330 core
 
 uniform vec3 cameraPos;
+uniform int player_id;
 
 out vec4 FragColor;
 
@@ -16,6 +17,10 @@ void main()
     vec3 R = refract(I, normal, ratio);
     vec3 R_norm = (R + vec3(1.0f)) / 2.0f;
     vec3 face_color = vec3(1.0f) - 0.7 * R_norm*R_norm;
+
+    if (player_id == 2) {
+        face_color = vec3(1.0f) - face_color;
+    }
 
     vec3 edge_color = vec3(1.0f);
 
