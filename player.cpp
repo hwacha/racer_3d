@@ -48,8 +48,11 @@ void step_player(PlayerInputs input, Player *player) {
     // update orientation
     glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
     glm::vec3 globalRotationAxis = glm::cross(player->forward(), up);
-    glm::quat globalRotation =
-        glm::rotate(glm::mat4(1.0f), -rotation_angle, globalRotationAxis);
+    float rotation_factor = 0.33f; // artificially slow the rotation for looks
+    glm::quat globalRotation = glm::rotate(
+        glm::mat4(1.0f),
+        -rotation_angle * rotation_factor,
+        globalRotationAxis);
     player->orientation = globalRotation * player->orientation;
 
     // update pitch
