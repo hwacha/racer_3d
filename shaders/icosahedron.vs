@@ -8,10 +8,12 @@ uniform mat4 projection;
 
 out vec3 pos;
 out vec3 pos_screen;
+out vec3 bary;
 
 void main()
 {
     gl_Position = projection * view * model * vec4(aPos.x, aPos.y, aPos.z, 1.0);
 	pos = (model * vec4(aPos, 1)).xyz;
 	pos_screen = gl_Position.xyz;
+  bary = aBary;
 }

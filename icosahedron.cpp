@@ -71,8 +71,35 @@ std::vector<unsigned int> icosahedron_indices() {
 }
 
 unsigned int make_icosahedron() {
-    std::vector<float> vertices = icosahedron_vertices(0.5);
+    std::vector<float> unique_vertices = icosahedron_vertices(0.5);
     std::vector<unsigned int> indices = icosahedron_indices();
+
+    std::vector<float> vertices{};
+
+    int triangle;
+    int in_vertex = 0;
+    int index = 0;
+    int i = 0;
+    // For each face (triangle) ...
+    for ( triangle = 0 ; triangle < 20 ; triangle++ ) {
+        // ... and for each of its vertices ...
+        for ( in_vertex = 0 ; in_vertex < 3 ; in_vertex++ ) {
+            // ... find its index in the unique vertices ...
+            index = indices[in_vertex + triangle*3];
+            // ... write out the vertex coordinates ...
+            for ( i = 0 ; i < 3 ; i++ ) {
+                vertices.push_back(unique_vertices[3*index + i]);
+            }
+            // ... and write out the barycentric coordinates
+            for ( i = 0 ; i < 3 ; i++ ) {
+                if (i == in_vertex) {
+                    vertices.push_back(1.0);
+                } else {
+                    vertices.push_back(0.0);
+                }
+            }
+        }
+    }
 
     unsigned int vertex_arr;
     glGenVertexArrays(1, &vertex_arr);
@@ -81,15 +108,17 @@ unsigned int make_icosahedron() {
     unsigned int vertex_buf;
     glGenBuffers(1, &vertex_buf);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*3*12, vertices.data(), GL_STATIC_DRAW);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        vertices.size()*sizeof(float),
+        vertices.data(),
+        GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    unsigned int indices_buf;
-    glGenBuffers(1, &indices_buf);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices_buf);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*3*20, indices.data(), GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
@@ -102,8 +131,8 @@ void draw_icosahedron(
     unsigned int icosahedron_va)
 {
     shader.setMat4("model", transform);
-	shader.setFloat("t", (float)glfwGetTime());
-	glBindVertexArray(icosahedron_va);
-    glDrawElements(GL_TRIANGLES, 3*20, GL_UNSIGNED_INT, (void*)0);
+    shader.setFloat("t", (float)glfwGetTime());
+    glBindVertexArray(icosahedron_va);
+    glDrawArrays(GL_TRIANGLES, 0, 3*20);
     glBindVertexArray(0);
 }

@@ -102,7 +102,7 @@ int main()
     }
 
     // World
-    std::vector<Obstacle> world_cubes{0};
+    std::vector<Obstacle> world_cubes{};
 
     // Floor
     for ( i = 0 ; i < 10 ; i++ ) {
