@@ -1,1 +1,1 @@
-g++ -std=c++11 -W -Wdeprecated main.cpp cube.cpp icosahedron.cpp input.cpp player.cpp skybox.cpp -framework OpenGL -framework GLUT -Ibuild/include glad/glad.c -lglfw -lassimp -o scene.out
+g++ -std=c++11 -W -Wdeprecated main.cpp prism.cpp icosahedron.cpp input.cpp player.cpp skybox.cpp -framework OpenGL -framework GLUT -Ibuild/include glad/glad.c -lglfw -lassimp -o scene.out

@@ -10,8 +10,8 @@ Player initial_player() {
     struct Player player;
     player.position = glm::vec3(0.0f, 0.5f, 0.0f);
     player.speed = 0.0f;
-    player.pitch_rads = 0.0; // Ack! Euler angles!
-    player.yaw_rads = 0.0;
+    player.pitch_rads = 0.0f; // Ack! Euler angles!
+    player.yaw_rads = -M_PI * 0.5f;
     return player;
 }
 
