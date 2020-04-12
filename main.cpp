@@ -174,6 +174,9 @@ int main()
     int current_checkpoint = 0;
     int current_lap = 0;
 
+	float yvel = 0;
+	float grav = -0.01;
+
     vector<int> player_laps{};
     player_laps.push_back(1);
 
@@ -198,7 +201,26 @@ int main()
 
       glm::vec3 old_position = glm::vec3(player.position.x, player.position.y, player.position.z);
 
-      step_player(inputs, &player);
+	  yvel+= grav;
+	  player.position.y+= yvel;
+
+	  if(player.position.y<0.501) step_player(inputs, &player);
+
+	  // check if dieded from falling too far
+	  if(player.position.y < -5)
+	  {
+		  // player pos = last checkpoint pos
+		  glm::vec3 lastcheckpointpos;
+		  for (auto obstacle : world_prisms) {
+			  if(obstacle.checkpoint_place==current_checkpoint){
+				  lastcheckpointpos = obstacle.position;
+				  break;
+			  }
+		  }
+
+		  player.position = lastcheckpointpos;
+
+	  }
 
       // check for collisions.
       for (auto obstacle : world_prisms) {
@@ -207,10 +229,17 @@ int main()
           if (obstacle.collision_type == 1) {
 
             // TODO: check for collision with player
-
              player.position = old_position;
              player.speed *= -1.0f;
           }
+
+		  // check if on floor
+          if (obstacle.collision_type == 0) {
+			  if(yvel<0 && player.position.y<0.5 && player.position.y>-3*grav){
+				  yvel = 0;
+				  player.position.y = 0.5;
+			  }
+		  }
 
           // checkpoint.
           if (obstacle.collision_type == 2) {
@@ -251,9 +280,18 @@ int main()
         scr_width / (float) scr_height, 1.f, 1000.0f);
 
       // icosahedron
-      glm::mat4 icosa_rotate = glm::mat4_cast(player.orientation);
+
+      glm::mat4 icosa_roll = glm::rotate(
+          glm::mat4(1.0f),
+          player.pitch_rads,
+          glm::vec3(0.0f, 0.0f, -1.0f));
+      glm::mat4 icosa_yaw = glm::rotate(
+          glm::mat4(1.0f),
+          player.yaw_rads,
+          glm::vec3(0.0f, 1.0f, 0.0f));
       glm::mat4 icosa_trans = glm::translate(glm::mat4(1.0f), player.position);
-      glm::mat4 icosahedron_model = icosa_trans * icosa_rotate;
+      glm::mat4 icosahedron_model =
+          icosa_trans * icosa_yaw * icosa_roll * glm::mat4(1.0f);
 
         // icosahedron body
       icosahedron_shader.use();
