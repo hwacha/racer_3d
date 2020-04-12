@@ -237,7 +237,6 @@ int main()
 
 			  player.position = lastcheckpointpos;
 
-			 fx_system.create_collision((void *)&player, player.position);
 		  }
 
 	      // check for collisions.
@@ -249,6 +248,7 @@ int main()
 	            // TODO: check for collision with player
 	             player.position = old_position;
 	             player.speed *= -1.0f;
+				 fx_system.create_collision((void *)&player, player.position);
 	          }
 
 			  // check if on floor
@@ -344,7 +344,14 @@ int main()
 	      glBindVertexArray(sky.vao);
 	      glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
 
-	      // level
+
+          // effects
+          sky_shader.use();
+          fx_system.view = view;
+          fx_system.proj = projection;
+          fx_system.Draw();
+ 
+		  // level
 
 	      //level_shader.use();
 	      //level_shader.setMat4("model",
