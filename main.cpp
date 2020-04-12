@@ -161,6 +161,8 @@ int main()
       }
 
       if (winning_player) {
+      	glfwSwapBuffers(window);
+      	glfwPollEvents();
       	// victory screen
       	continue;
       }
