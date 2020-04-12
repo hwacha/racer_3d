@@ -190,7 +190,7 @@ int main()
       glm::mat4 icosa_roll = glm::rotate(
           glm::mat4(1.0f),
           player.pitch_rads,
-          glm::vec3(0.0f, 0.0f, 1.0f));
+          glm::vec3(0.0f, 0.0f, -1.0f));
       glm::mat4 icosa_yaw = glm::rotate(
           glm::mat4(1.0f),
           player.yaw_rads,
