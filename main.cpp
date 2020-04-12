@@ -171,7 +171,7 @@ int main()
       	continue;
       }
 
-      glm::vec3 old_position = glm::vec3(player.position.y, player.position.y, player.position.z);
+      glm::vec3 old_position = glm::vec3(player.position.x, player.position.y, player.position.z);
       
       step_player(inputs, &player);
 
