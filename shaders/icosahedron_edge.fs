@@ -6,5 +6,7 @@ in vec3 pos;
 
 void main()
 {
-    FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+    float dzdy = dFdy(pos.z);
+    float dzdx = dFdx(pos.z);
+    FragColor = vec4(0.3, 200 * dzdx, 200 * dzdy, 1.0f);
 }
