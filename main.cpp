@@ -186,7 +186,7 @@ int main()
       		}
       	}
       	if (obstacle.collision_type & 2) {
-          if(collides_with(&player, &obstacle))  {
+          if(collides_with(&player, &obstacle)) {
             // @Note: this'll change once we
             // have more than one player.
             winning_player = 1;
@@ -200,11 +200,13 @@ int main()
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
       // view
-      glm::mat4 view;
-      view = glm::lookAt(
-          player.position - 2.0f*player.forward() + glm::vec3(0.0f, 0.5f, 0.0f),
+      glm::vec3 camera_pos =
+          player.position - 2.0f*player.forward() + glm::vec3(0.0f, 0.5f, 0.0f);
+      glm::mat4 view = glm::lookAt(
+          camera_pos,
           player.position,
-          glm::vec3(0.0f, 1.0f, 0.0f));
+          glm::vec3(0.0f, 1.0f, 0.0f)
+          );
 
       // projection
       glm::mat4 projection;
@@ -227,6 +229,7 @@ int main()
 
         // icosahedron body
       icosahedron_shader.use();
+      icosahedron_shader.setVec3("cameraPos", camera_pos);
       icosahedron_shader.setMat4("view", view);
       icosahedron_shader.setMat4("projection", projection);
       draw_icosahedron(icosahedron_shader, icosahedron_model, icosahedron_va);
