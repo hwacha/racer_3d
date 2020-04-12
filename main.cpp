@@ -64,11 +64,12 @@ unsigned int createTexture(char* filename)
 }
 
 bool collides_with(Player *player, Obstacle *obstacle) {
-	float player_width = 0.5f;
-	return player->position.x + player_width > obstacle->position.x - obstacle->scale.x &&
-          	 player->position.x - player_width < obstacle->position.x + obstacle->scale.x &&
-          	 player->position.z + player_width > obstacle->position.z - obstacle->scale.z &&
-          	 player->position.z - player_width < obstacle->position.z + obstacle->scale.z;
+	float player_radius = 0.5f;
+
+  float rel_x = max(0.0f, abs(player->position.x - obstacle->position.x) - obstacle->scale.x);
+  float rel_z = max(0.0f, abs(player->position.z - obstacle->position.z) - obstacle->scale.z);
+pe
+  return (rel_x*rel_x + rel_z*rel_z <= player_radius*player_radius);
 }
 
 int main()
@@ -183,6 +184,7 @@ int main()
       		// TODO: check for collision with player
       		if (collides_with(&player, &obstacle)) {
           	 	player.position = old_position;
+          	 	player.speed *= -1.0f;
       		}
       	}
       	if (obstacle.collision_type & 2) {
