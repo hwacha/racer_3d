@@ -24,7 +24,7 @@ struct CrashEffect : Effect {
 	void Update(int dt) { this->ticks += dt; }
 	
 	void Draw() {
-      glBindVertexArray(quad.vao);
+	  glBindVertexArray(quad.vao);
 	  glDisable(GL_DEPTH_TEST);
 	  glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
 	  glEnable(GL_DEPTH_TEST);

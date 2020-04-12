@@ -11,5 +11,5 @@ uniform float effect_t;
 void main()
 {
     float r = 0.03;
-    FragColor = vec4(1 - r * effect_t, 0, 1 - r * effect_t, 1 - r * effect_t);
+    FragColor = vec4(1.3 - r * effect_t, 1 - r * effect_t, 1 - r * effect_t, 1 - r * effect_t);
 }

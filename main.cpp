@@ -236,7 +236,9 @@ int main()
             // TODO: check for collision with player
              player.position = old_position;
              player.speed *= -1.0f;
-          }
+
+			 fx_system.create_collision((void *)&player, player.position);
+		  }
 
 		  // check if on floor
           if (obstacle.collision_type == 0) {
