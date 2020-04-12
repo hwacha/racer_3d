@@ -251,18 +251,9 @@ int main()
         scr_width / (float) scr_height, 1.f, 1000.0f);
 
       // icosahedron
-
-      glm::mat4 icosa_roll = glm::rotate(
-          glm::mat4(1.0f),
-          player.pitch_rads,
-          glm::vec3(0.0f, 0.0f, -1.0f));
-      glm::mat4 icosa_yaw = glm::rotate(
-          glm::mat4(1.0f),
-          player.yaw_rads,
-          glm::vec3(0.0f, 1.0f, 0.0f));
+      glm::mat4 icosa_rotate = glm::mat4_cast(player.orientation);
       glm::mat4 icosa_trans = glm::translate(glm::mat4(1.0f), player.position);
-      glm::mat4 icosahedron_model =
-          icosa_trans * icosa_yaw * icosa_roll * glm::mat4(1.0f);
+      glm::mat4 icosahedron_model = icosa_trans * icosa_rotate;
 
         // icosahedron body
       icosahedron_shader.use();

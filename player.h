@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #ifndef INPUT
@@ -15,6 +16,7 @@ struct Player {
     unsigned int id;
     glm::vec3 position;
     float speed;
+    glm::quat orientation;
     float pitch_rads; // currently just for rolling animation
     float yaw_rads;
     glm::vec3 forward() {

@@ -11,8 +11,8 @@ Player initial_player(unsigned int id) {
     player.id = id;
     player.position = glm::vec3(0.0f, 0.5f, 0.0f);
     player.speed = 0.0f;
+    player.orientation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
     player.pitch_rads = 0.0f; // Ack! Euler angles!
-    player.yaw_rads = -M_PI * 0.5f;
     return player;
 }
 
@@ -40,9 +40,17 @@ void step_player(PlayerInputs input, Player *player) {
     player->speed *= 1.0f - 0.125f; // drag
     player->position += player->forward() * player->speed;
 
-    // pitch and yaw
+    // pitch and yaw and orientation
     float radius = 0.5f; // needs to match the rendering radius
+    float rotation_angle = player->speed / radius;
     float tau = 2.0f*M_PI;
+
+    // update orientation
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 globalRotationAxis = glm::cross(player->forward(), up);
+    glm::quat globalRotation =
+        glm::rotate(glm::mat4(1.0f), -rotation_angle, globalRotationAxis);
+    player->orientation = globalRotation * player->orientation;
 
     // update pitch
     float pitch_rads_new = fmod(
