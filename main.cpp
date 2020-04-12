@@ -64,11 +64,10 @@ unsigned int createTexture(char* filename)
 }
 
 bool collides_with(Player *player, Obstacle *obstacle) {
-	float player_radius = 0.5f;
+  float player_radius = 0.5f;
 
   float rel_x = max(0.0f, abs(player->position.x - obstacle->position.x) - obstacle->scale.x);
   float rel_z = max(0.0f, abs(player->position.z - obstacle->position.z) - obstacle->scale.z);
-pe
   return (rel_x*rel_x + rel_z*rel_z <= player_radius*player_radius);
 }
 
@@ -113,22 +112,22 @@ int main()
 
     // Floor
     glm::vec3 floor_scale = glm::vec3(5.0f, 0.5f, 100.0f);
-    Obstacle floor{0, floor_scale, glm::vec3(0.0f, -0.5f, 0.0f)};
+    Obstacle floor{Floor, floor_scale, glm::vec3(0.0f, -0.5f, 0.0f)};
     world_prisms.push_back(floor);
 
     // obstacles
     float obs_scale = 1.0f;
-   	Obstacle obs_1{1, glm::vec3(obs_scale), glm::vec3(0.0f, 0.5f, 10.0f)};
+   	Obstacle obs_1{Stop, glm::vec3(obs_scale), glm::vec3(0.0f, 0.5f, 10.0f)};
    	world_prisms.push_back(obs_1);
 
-   	Obstacle obs_2{1, glm::vec3(obs_scale), glm::vec3(3.0f, 0.5f, 20.0f)};
+   	Obstacle obs_2{Stop, glm::vec3(obs_scale), glm::vec3(3.0f, 0.5f, 20.0f)};
    	world_prisms.push_back(obs_2);
 
-   	Obstacle obs_3{1, glm::vec3(obs_scale), glm::vec3(-3.0f, 0.5f, 30.0f)};
+   	Obstacle obs_3{Stop, glm::vec3(obs_scale), glm::vec3(-3.0f, 0.5f, 30.0f)};
    	world_prisms.push_back(obs_3);
 
    	// checkpoints
-   	Obstacle checkpoint{2, glm::vec3(obs_scale), glm::vec3(0.5f, 0.0f, 90.0f)};
+   	Obstacle checkpoint{Checkpoint, glm::vec3(obs_scale), glm::vec3(0.5f, 0.0f, 90.0f)};
    	world_prisms.push_back(checkpoint);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
