@@ -9,7 +9,7 @@
 #include <vector>
 #include <tuple>
 
-#include "cube.h"
+#include "prism.h"
 #include "framebuffer.h"
 #include "icosahedron.h"
 
@@ -63,7 +63,13 @@ unsigned int createTexture(char* filename)
 	return texture;//?
 }
 
-
+bool collides_with(Player *player, Obstacle *obstacle) {
+	float player_width = 0.5f;
+	return player->position.x + player_width > obstacle->position.x - obstacle->scale.x &&
+          	 player->position.x - player_width < obstacle->position.x + obstacle->scale.x &&
+          	 player->position.z + player_width > obstacle->position.z - obstacle->scale.z &&
+          	 player->position.z - player_width < obstacle->position.z + obstacle->scale.z;
+}
 
 int main()
 {
@@ -102,29 +108,32 @@ int main()
     }
 
     // World
-    std::vector<Obstacle> world_cubes{};
+    std::vector<Obstacle> world_prisms{};
 
     // Floor
-    for ( i = 0 ; i < 10 ; i++ ) {
-        float scale = 5.0f;
-        Obstacle floor_piece{scale, glm::vec3(2.0f * scale * i, -scale, 0.0f)};
-        world_cubes.push_back(floor_piece);
-    }
+    glm::vec3 floor_scale = glm::vec3(5.0f, 0.5f, 100.0f);
+    Obstacle floor{0, floor_scale, glm::vec3(0.0f, -0.5f, 0.0f)};
+    world_prisms.push_back(floor);
+
     // obstacles
-   	float scale = 1.0f;
-   	Obstacle obs_1{scale, glm::vec3(10.0f, 0.5f, 0.0f)};
-   	world_cubes.push_back(obs_1);
+    float obs_scale = 1.0f;
+   	Obstacle obs_1{1, glm::vec3(obs_scale), glm::vec3(0.0f, 0.5f, 10.0f)};
+   	world_prisms.push_back(obs_1);
 
-   	Obstacle obs_2{scale, glm::vec3(20.0f, 0.5f, 3.0f)};
-   	world_cubes.push_back(obs_2);
+   	Obstacle obs_2{1, glm::vec3(obs_scale), glm::vec3(3.0f, 0.5f, 20.0f)};
+   	world_prisms.push_back(obs_2);
 
-   	Obstacle obs_3{scale, glm::vec3(30.0f, 0.5f, -3.0f)};
-   	world_cubes.push_back(obs_3);
+   	Obstacle obs_3{1, glm::vec3(obs_scale), glm::vec3(-3.0f, 0.5f, 30.0f)};
+   	world_prisms.push_back(obs_3);
+
+   	// checkpoints
+   	Obstacle checkpoint{2, glm::vec3(obs_scale), glm::vec3(0.5f, 0.0f, 90.0f)};
+   	world_prisms.push_back(checkpoint);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     unsigned int icosahedron_va = make_icosahedron();
-    unsigned int cube_va = make_cube();
+    unsigned int prism_va = make_prism();
 
     Shader icosahedron_shader("shaders/icosahedron.vs", "shaders/icosahedron.fs");
     ///Shader icosahedron_edge_shader("shaders/icosahedron_edge.vs", "shaders/icosahedron_edge.fs");
@@ -144,6 +153,9 @@ int main()
 
     FrameBuffer buffer0{scr_width, scr_height};
 
+    // 1 if player 1 wins, 2 if player 2 wins, etc.
+    int winning_player = 0;
+
     while(!glfwWindowShouldClose(window)) {
       buffer0.activate();
 
@@ -153,9 +165,36 @@ int main()
           break;
       }
 
+      if (winning_player) {
+      	glfwSwapBuffers(window);
+      	glfwPollEvents();
+      	// victory screen
+      	continue;
+      }
+
+      glm::vec3 old_position = glm::vec3(player.position.x, player.position.y, player.position.z);
+      
       step_player(inputs, &player);
 
-    	// render
+      // check for collisions.
+      for (auto obstacle : world_prisms) {
+      	if (obstacle.collision_type & 1) {
+
+      		// TODO: check for collision with player
+      		if (collides_with(&player, &obstacle)) {
+          	 	player.position = old_position;
+      		}
+      	}
+      	if (obstacle.collision_type & 2) {
+          if(collides_with(&player, &obstacle))  {
+            // @Note: this'll change once we
+            // have more than one player.
+            winning_player = 1;
+		  }
+      	}
+      }
+
+      // render
       // ------
       glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -209,7 +248,7 @@ int main()
       level_shader.setMat4("view", view);
       level_shader.setMat4("projection", projection);
 
-      for (auto obs : world_cubes) {
+      for (auto obs : world_prisms) {
           glm::mat4 id_mat = glm::mat4(1.0f);
 
           glm::mat4 scale_mat = glm::scale(glm::mat4(1.0f), glm::vec3(obs.scale));
@@ -218,7 +257,7 @@ int main()
           glm::mat4 obstacle_model = trans_mat * scale_mat * id_mat;
 
 		  glBindTexture(GL_TEXTURE_2D, testTexture);
-          draw_cube(level_shader, obstacle_model, cube_va);
+          draw_prism(level_shader, obstacle_model, prism_va);
       }
 
       // sky
