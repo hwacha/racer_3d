@@ -68,7 +68,6 @@ bool collides_with(Player *player, Obstacle *obstacle) {
 
   float rel_x = max(0.0f, abs(player->position.x - obstacle->position.x) - obstacle->scale.x);
   float rel_z = max(0.0f, abs(player->position.z - obstacle->position.z) - obstacle->scale.z);
-pe
   return (rel_x*rel_x + rel_z*rel_z <= player_radius*player_radius);
 }
 
