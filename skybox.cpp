@@ -3,7 +3,7 @@
 
 #include "skybox.h"
 
-ArrayObject create_skybox() {
+ArrayObject create_fullscreen_quad() {
   float z = 0.999;
   float skybox_vertices[] = {
    -1 , -1,  z,
@@ -12,7 +12,7 @@ ArrayObject create_skybox() {
     1,   1,  z,
   };
 
-  GLuint skybox_indices[] = { 0, 1, 2, 1, 2, 3, 0, 2, 1, 2, 1, 3 };
+  GLuint skybox_indices[] = { 0, 1, 2, 1, 2, 3, };
   ArrayObject sky;
   glGenVertexArrays(1, &sky.vao);
   glGenBuffers(1, &sky.array_buf);
