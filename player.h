@@ -27,5 +27,5 @@ struct Player {
 	}
 };
 
-Player initial_player(unsigned int id);
+Player initial_player(unsigned int id, glm::vec2 initial_position);
 void step_player(PlayerInputs input, Player *player);
