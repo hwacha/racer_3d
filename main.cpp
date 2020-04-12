@@ -280,36 +280,15 @@ int main()
         scr_width / (float) scr_height, 1.f, 1000.0f);
 
       // icosahedron
-
-      glm::mat4 icosa_roll = glm::rotate(
-          glm::mat4(1.0f),
-          player.pitch_rads,
-          glm::vec3(0.0f, 0.0f, -1.0f));
-      glm::mat4 icosa_yaw = glm::rotate(
-          glm::mat4(1.0f),
-          player.yaw_rads,
-          glm::vec3(0.0f, 1.0f, 0.0f));
+      glm::mat4 icosa_rotate = glm::mat4_cast(player.orientation);
       glm::mat4 icosa_trans = glm::translate(glm::mat4(1.0f), player.position);
-      glm::mat4 icosahedron_model =
-          icosa_trans * icosa_yaw * icosa_roll * glm::mat4(1.0f);
+      glm::mat4 icosahedron_model = icosa_trans * icosa_rotate;
 
-        // icosahedron body
       icosahedron_shader.use();
       icosahedron_shader.setVec3("cameraPos", camera_pos);
       icosahedron_shader.setMat4("view", view);
       icosahedron_shader.setMat4("projection", projection);
       draw_icosahedron(icosahedron_shader, icosahedron_model, icosahedron_va);
-
-      // icosahedron edges
-      // icosahedron_edge_shader.use();
-
-      // icosahedron_edge_shader.setMat4("view", view);
-      // icosahedron_edge_shader.setMat4("projection", projection);
-
-      // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-      // draw_icosahedron(icosahedron_edge_shader, icosahedron_model, icosahedron_va);
-      // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // reset
-
 
       // floor and obstacles
       level_shader.use();
