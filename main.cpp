@@ -190,6 +190,7 @@ int main()
     // -------------------------------------------------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------------------------------------------------
 
+    bool has_logged_victory_message = false;
     while(!glfwWindowShouldClose(window)) {
       buffer0.activate();
 
@@ -202,6 +203,15 @@ int main()
       if (winning_player) {
         glfwSwapBuffers(window);
         glfwPollEvents();
+        if (!has_logged_victory_message) {
+			for (auto player : players) {
+				if (winning_player & (1 << player.id)) {
+					std::cout << "Player" << player.id << "wins!" << std::endl;
+        		}
+        	}
+        	has_logged_victory_message = true;    	
+        }
+
         // victory screen
         continue;
       }
@@ -263,6 +273,7 @@ int main()
 		          if (current_checkpoint == 0) {
 		            // assume one lap for now, otherwise we can increment laps and check max laps, etc.
 		            player_laps[player.id - 1]++;
+		            std::cout << "Player " << player.id << " is now on lap " << player_laps[player.id - 1] << std::endl;
 		            if (player_laps[player.id - 1] >= 4) {
 		              winning_player |= 1 << player.id;
 		            }
