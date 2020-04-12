@@ -38,33 +38,33 @@ unsigned int scr_height = 720;
 
 unsigned int createTexture(char* filename)
 {
-	unsigned int texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	// set the texture wrapping/filtering options (on the currently bound texture object)
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load and generate the texture
-	int width, height, nrChannels;
-	unsigned char *data = stbi_load(filename, &width, &height, &nrChannels, 0);
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-	}
-	stbi_image_free(data);
+  unsigned int texture;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+  // set the texture wrapping/filtering options (on the currently bound texture object)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // load and generate the texture
+  int width, height, nrChannels;
+  unsigned char *data = stbi_load(filename, &width, &height, &nrChannels, 0);
+  if (data)
+  {
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+  }
+  else
+  {
+    std::cout << "Failed to load texture" << std::endl;
+  }
+  stbi_image_free(data);
 
-	return texture;//?
+  return texture;//?
 }
 
 bool collides_with(Player *player, Obstacle *obstacle) {
-	float player_radius = 0.5f;
+  float player_radius = 0.5f;
 
   float rel_x = max(0.0f, abs(player->position.x - obstacle->position.x) - obstacle->scale.x);
   float rel_z = max(0.0f, abs(player->position.z - obstacle->position.z) - obstacle->scale.z);
@@ -111,24 +111,42 @@ int main()
     std::vector<Obstacle> world_prisms{};
 
     // Floor
-    glm::vec3 floor_scale = glm::vec3(5.0f, 0.5f, 100.0f);
-    Obstacle floor{0, floor_scale, glm::vec3(0.0f, -0.5f, 0.0f)};
-    world_prisms.push_back(floor);
+    Obstacle floor_1{0, -1, glm::vec3(5.0f, 0.5f, 50.0f), glm::vec3(0.0f, -0.5f, 50.0f)};
+    world_prisms.push_back(floor_1);
+
+    Obstacle floor_2{0, -1, glm::vec3(50.0f, 0.5f, 5.0f), glm::vec3(50.0f, -0.5f, 100.0f)};
+    world_prisms.push_back(floor_2);
+
+    Obstacle floor_3{0, -1, glm::vec3(5.0f, 0.5f, 50.0f), glm::vec3(100.0f, -0.5f, 50.0f)};
+    world_prisms.push_back(floor_3);
+
+    Obstacle floor_4{0, -1, glm::vec3(50.0f, 0.5f, 5.0f), glm::vec3(50.0f, -0.5f, 0.0f)};
+    world_prisms.push_back(floor_4);
 
     // obstacles
     float obs_scale = 1.0f;
-   	Obstacle obs_1{1, glm::vec3(obs_scale), glm::vec3(0.0f, 0.5f, 10.0f)};
-   	world_prisms.push_back(obs_1);
+     Obstacle obs_1{1, -1, glm::vec3(obs_scale), glm::vec3(0.0f, 0.5f, 10.0f)};
+     world_prisms.push_back(obs_1);
 
-   	Obstacle obs_2{1, glm::vec3(obs_scale), glm::vec3(3.0f, 0.5f, 20.0f)};
-   	world_prisms.push_back(obs_2);
+     Obstacle obs_2{1, -1, glm::vec3(obs_scale), glm::vec3(3.0f, 0.5f, 20.0f)};
+     world_prisms.push_back(obs_2);
 
-   	Obstacle obs_3{1, glm::vec3(obs_scale), glm::vec3(-3.0f, 0.5f, 30.0f)};
-   	world_prisms.push_back(obs_3);
+     Obstacle obs_3{1, -1, glm::vec3(obs_scale), glm::vec3(-3.0f, 0.5f, 30.0f)};
+     world_prisms.push_back(obs_3);
 
-   	// checkpoints
-   	Obstacle checkpoint{2, glm::vec3(obs_scale), glm::vec3(0.5f, 0.0f, 90.0f)};
-   	world_prisms.push_back(checkpoint);
+     // checkpoints
+     unsigned int num_checkpoints = 4;
+     Obstacle lap{2, 0, glm::vec3(5.0f, obs_scale, obs_scale), glm::vec3(0.5f, 1.0f, 5.0f)};
+     world_prisms.push_back(lap);
+
+     Obstacle checkpoint_1{2, 1, glm::vec3(obs_scale, obs_scale, 5.0f), glm::vec3(5.0f, 1.0f, 100.0f)};
+     world_prisms.push_back(checkpoint_1);
+
+     Obstacle checkpoint_2{2, 2, glm::vec3(5.0f, obs_scale, obs_scale), glm::vec3(100.0f, 1.0f, 94.0f)};
+     world_prisms.push_back(checkpoint_2);
+
+     Obstacle checkpoint_3{2, 3, glm::vec3(obs_scale, obs_scale, 5.0f), glm::vec3(94.0f, 1.0f, 0.0f)};
+     world_prisms.push_back(checkpoint_3);
 
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -149,9 +167,15 @@ int main()
     glEnable(GL_DEPTH_TEST);
 
     /* glm::vec3 player_position{ 0,0,0 }; */
-    Player player = initial_player();
+    Player player = initial_player(1);
 
     FrameBuffer buffer0{scr_width, scr_height};
+
+    int current_checkpoint = 0;
+    int current_lap = 0;
+
+    vector<int> player_laps{};
+    player_laps.push_back(1);
 
     // 1 if player 1 wins, 2 if player 2 wins, etc.
     int winning_player = 0;
@@ -159,17 +183,17 @@ int main()
     while(!glfwWindowShouldClose(window)) {
       buffer0.activate();
 
-    	// handle inputs
+      // handle inputs
       PlayerInputs inputs = poll_inputs(window);
       if (inputs.key_esc_pressed) {
           break;
       }
 
       if (winning_player) {
-      	glfwSwapBuffers(window);
-      	glfwPollEvents();
-      	// victory screen
-      	continue;
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+        // victory screen
+        continue;
       }
 
       glm::vec3 old_position = glm::vec3(player.position.x, player.position.y, player.position.z);
@@ -178,21 +202,33 @@ int main()
 
       // check for collisions.
       for (auto obstacle : world_prisms) {
-      	if (obstacle.collision_type & 1) {
+        if (collides_with(&player, &obstacle)) {
+          // normal obstacle.
+          if (obstacle.collision_type == 1) {
 
-      		// TODO: check for collision with player
-      		if (collides_with(&player, &obstacle)) {
-          	 	player.position = old_position;
-          	 	player.speed *= -1.0f;
-      		}
-      	}
-      	if (obstacle.collision_type & 2) {
-          if(collides_with(&player, &obstacle)) {
-            // @Note: this'll change once we
-            // have more than one player.
-            winning_player = 1;
-		  }
-      	}
+            // TODO: check for collision with player
+            
+             player.position = old_position;
+             player.speed *= -1.0f;
+          }
+
+          // checkpoint.
+          if (obstacle.collision_type == 2) {
+            if ((current_checkpoint + 1) % num_checkpoints == obstacle.checkpoint_place) {
+          current_checkpoint = (current_checkpoint + 1) % num_checkpoints;
+          // we check for a lap, but we only want to do so if we're inside this condition,
+          // because that means the last checkpoint was the last one, not when we started at 0.
+          
+          if (current_checkpoint == 0) {
+            // assume one lap for now, otherwise we can increment laps and check max laps, etc.
+            player_laps[player.id - 1]++;
+            if (player_laps[player.id - 1] >= 4) {
+              winning_player |= 1 << player.id;  
+            }
+          }
+            }
+          }
+        }
       }
 
       // render
@@ -257,8 +293,11 @@ int main()
 
           glm::mat4 obstacle_model = trans_mat * scale_mat * id_mat;
 
-		  glBindTexture(GL_TEXTURE_2D, testTexture);
-          draw_prism(level_shader, obstacle_model, prism_va);
+      glBindTexture(GL_TEXTURE_2D, testTexture);
+
+      if (!(obs.collision_type == 2)) {
+        draw_prism(level_shader, obstacle_model, prism_va);
+      }
       }
 
       // sky
