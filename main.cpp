@@ -47,10 +47,10 @@ unsigned int createTexture(char* filename)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   // load and generate the texture
   int width, height, nrChannels;
-  unsigned char *data = stbi_load(filename, &width, &height, &nrChannels, 0);
+  unsigned char *data = stbi_load(filename, &width, &height, &nrChannels, STBI_rgb_alpha);
   if (data)
   {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
   }
   else
@@ -192,13 +192,10 @@ int main()
     // RENDER LOOP
     // -------------------------------------------------------------------------------------------------------------------------
     // -------------------------------------------------------------------------------------------------------------------------
-
     bool has_logged_victory_message = false;
     while(!glfwWindowShouldClose(window)) {
       buffer0.activate();
-
 	  fx_system.Update(1);
-
       // handle inputs
       PlayerInputs inputs = poll_inputs(window);
       if (inputs.key_esc_pressed) {
@@ -206,7 +203,8 @@ int main()
       }
 
       if (winning_player) {
-        glfwSwapBuffers(window);
+        buffer0.activate(false);
+        // glfwSwapBuffers(window);
         glfwPollEvents();
         if (!has_logged_victory_message) {
 			for (auto player : players) {
@@ -258,7 +256,12 @@ int main()
 	            // TODO: check for collision with player
 	             player.position = old_position;
 	             player.speed *= -1.0f;
-				 fx_system.create_collision((void *)&player, player.position);
+				 fx_system.create_collision(
+                     (void *)&player,
+                     player.position,
+                     player.pitch_rads,
+                     player.yaw_rads
+                 );
 	          }
 
 			  // check if on floor
@@ -280,9 +283,16 @@ int main()
 		            // assume one lap for now, otherwise we can increment laps and check max laps, etc.
 		            player_laps[player.id - 1]++;
 		            std::cout << "Player " << player.id << " is now on lap " << player_laps[player.id - 1] << std::endl;
-		            if (player_laps[player.id - 1] >= 4) {
+		            if (player_laps[player.id - 1] >= 1) {
 		              winning_player |= 1 << player.id;
-		            }
+
+                      fx_system.create_youwin(
+                          player.id,
+                          player.position,
+                          player.pitch_rads,
+                          player.yaw_rads
+                      );
+                    }
 		          }
 	            }
 	          }
@@ -360,7 +370,7 @@ int main()
           sky_shader.use();
           fx_system.view = view;
           fx_system.proj = projection;
-          fx_system.Draw();
+          fx_system.Draw(player.id);
  
 		  // level
 

@@ -1,75 +1,135 @@
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
 #include "shader.h"
 #include "skybox.h"
 
+unsigned int createTexture(char* filename);
+
 struct Effect {
-	virtual bool expired() { return false; }
-    virtual void Draw() { }
-	virtual void Update(int dt) { }
+    ArrayObject quad;
+    int ticks;
+    int tick_end = 60;
+
+    virtual ~Effect() {
+        glDeleteVertexArrays(1, &quad.vao);
+        glDeleteBuffers(1, &quad.array_buf);
+        glDeleteBuffers(1, &quad.element_buf);
+    }
+
+    virtual bool expired() { return ticks > tick_end; }
+
+    virtual void Update(int dt) { this->ticks += dt; }
+
+    virtual void Draw() {
+        glBindVertexArray(quad.vao);
+        glDisable(GL_DEPTH_TEST);
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
+        glEnable(GL_DEPTH_TEST);
+    }
+};
+
+struct WinEffect : Effect {
+    int player_id;
+    glm::vec3 pos;
+    glm::mat4 transform;
+
+    WinEffect(int p, glm::vec3 pos, glm::mat4 m) :
+       player_id(p),
+       pos(pos),
+       transform(m)
+    {
+        tick_end = 60 * 10;
+        ticks = 0;
+        quad = create_fullscreen_quad(0);
+    }
 };
 
 struct CrashEffect : Effect {
-	int ticks;
-	void * player;
-	glm::vec3 pos;
-	int tick_end = 60 * 3;
-	ArrayObject quad;
-	
-    CrashEffect(void * p, glm::vec3 pos) : ticks(0), player(p), pos(pos) {
-	  ArrayObject quad = create_fullscreen_quad();
-    }	
-	bool expired() { return ticks > tick_end; }
-	
-	void Update(int dt) { this->ticks += dt; }
-	
-	void Draw() {
-	  glBindVertexArray(quad.vao);
-	  glDisable(GL_DEPTH_TEST);
-	  glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, (void*)0);
-	  glEnable(GL_DEPTH_TEST);
-	}
+    void * player;
+    glm::vec3 pos;
+    glm::mat4 transform;
+
+    CrashEffect(void * p, glm::vec3 pos, glm::mat4 m) :
+       player(p),
+       pos(pos),
+       transform(m)
+    {
+        ticks = 0;
+        quad = create_fullscreen_quad(0);
+    }
 };
 
 struct EffectSystem {
-	Shader shader { "shaders/crash.vs", "shaders/crash.fs" };
-	std::vector<Effect *> all_effects{};
-	glm::mat4 view;
-	glm::mat4 proj;
-	
-	void create_collision(void * player, glm::vec3 pos) {
-		all_effects.push_back(new CrashEffect{player, pos});
-	}
-	
-	void Update(int frames) {
-		for(auto effect: all_effects)
-			effect->Update(frames);
-		for(size_t i = all_effects.size(); i -->0; ) {
-			if (all_effects[i]->expired()) {
-				delete all_effects[i];
-				all_effects[i] = all_effects.back();
-				
-				all_effects.pop_back();
-			}
-		}
-	}
+    Shader shader { "shaders/crash.vs", "shaders/crash.fs" };
+    std::vector<Effect *> all_effects{};
+    glm::mat4 view;
+    glm::mat4 proj;
 
-	void Draw() {
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		shader.use();
-		shader.setMat4("view", view);
-		shader.setMat4("projection", proj);
-		
-		for(auto effect: all_effects) {
-			auto crash = dynamic_cast<CrashEffect*>(effect);
-			if (crash) {
-				glm::mat4 model {1};
-				model = glm::translate(model, {crash->pos});
-				shader.setMat4("model", model);
-				shader.setFloat("effect_t", crash->ticks);
-				crash->Draw();
-			}
-		}
-	}
+    unsigned int explosionTexture = createTexture("assets/exp2_0.png");
+    unsigned int youWinTexture = createTexture("assets/you_win.png");
+
+    void create_youwin(
+        int player_id,
+        glm::vec3 player_pos,
+        float pitch_rads,
+        float yaw_rads
+    ) {
+        glm::mat4 m {1};
+        m = glm::translate(m, player_pos);
+        m = glm::rotate(m, (3.1416f) / 2 + yaw_rads, {0, 1, 0});
+        all_effects.push_back(new WinEffect{player_id, player_pos, m});
+    }
+    void create_collision(
+        void * player,
+        glm::vec3 player_pos,
+        float pitch_rads,
+        float yaw_rads
+    ) {
+        glm::mat4 m {1};
+        m = glm::translate(m, player_pos);
+        m = glm::rotate(m, (3.1416f) / 2 + yaw_rads, {0, 1, 0});
+        all_effects.push_back(new CrashEffect{player, player_pos, m});
+    }
+
+    void Update(int frames) {
+        for(auto effect: all_effects)
+            effect->Update(frames);
+        for(size_t i = all_effects.size(); i -->0; ) {
+            if (all_effects[i]->expired()) {
+                delete all_effects[i];
+                all_effects[i] = all_effects.back();
+                all_effects.pop_back();
+            }
+        }
+    }
+
+    void Draw(int viewing_player) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        shader.use();
+        shader.setMat4("view", view);
+        shader.setMat4("projection", proj);
+        
+        for(auto effect: all_effects) {
+            auto crash = dynamic_cast<CrashEffect*>(effect);
+            if (crash) {
+                glBindTexture(GL_TEXTURE_2D, explosionTexture);
+                shader.setMat4("model", crash->transform);
+                shader.setFloat("effect_time", crash->ticks);
+                shader.setInt("effect_type", 1);
+                crash->Draw();
+            }
+            auto win = dynamic_cast<WinEffect*>(effect);
+            if (win && win->player_id == viewing_player) {
+                glBindTexture(GL_TEXTURE_2D, youWinTexture);
+                shader.setMat4("model", win->transform);
+                shader.setFloat("effect_time", win->ticks);
+                shader.setInt("effect_type", 2);
+                win->Draw();
+            }
+        }
+    }
 };
