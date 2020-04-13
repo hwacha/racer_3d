@@ -176,7 +176,7 @@ int main()
     int current_lap = 0;
 
 	float yvel = 0;
-	float grav = -0.01;
+	float grav = -0.1;
 
     vector<int> player_laps{};
     player_laps.push_back(1);
