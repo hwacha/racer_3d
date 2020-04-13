@@ -283,7 +283,7 @@ int main()
 		            // assume one lap for now, otherwise we can increment laps and check max laps, etc.
 		            player_laps[player.id - 1]++;
 		            std::cout << "Player " << player.id << " is now on lap " << player_laps[player.id - 1] << std::endl;
-		            if (player_laps[player.id - 1] >= 1) {
+		            if (player_laps[player.id - 1] >= 4) {
 		              winning_player |= 1 << player.id;
 
                       fx_system.create_youwin(
