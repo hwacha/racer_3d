@@ -69,7 +69,7 @@ struct EffectSystem {
     glm::mat4 proj;
 
     unsigned int explosionTexture = createTexture("assets/exp2_0.png");
-    unsigned int youWinTexture = createTexture("assets/you_win.png");
+    unsigned int youWinTexture = createTexture("assets/winner.png");
 
     void create_youwin(
         int player_id,
@@ -78,7 +78,8 @@ struct EffectSystem {
         float yaw_rads
     ) {
         glm::mat4 m {1};
-        m = glm::translate(m, player_pos);
+        m = glm::translate(m, player_pos + glm::vec3 { 0.0f, 0.5f, 0.0f});
+        m = glm::scale(m, {1.0f, 0.2f, 1.0f});
         m = glm::rotate(m, (3.1416f) / 2 + yaw_rads, {0, 1, 0});
         all_effects.push_back(new WinEffect{player_id, player_pos, m});
     }
